@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 import sqlite3
-from typing import List
+from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import get_db_connection, init_db, row_to_dict
@@ -10,7 +10,9 @@ from backend.schemas import (
     ProductCreate,
     ProductResponse,
     ProductUpdateQuantity,
+    STTResponse,
 )
+from backend.stt import call_gnani_stt, validate_audio_file
 
 
 @asynccontextmanager
@@ -183,3 +185,47 @@ def delete_product(product_id: int):
         return {
             "message": f"Product '{row['name']}' (ID {product_id}) successfully deleted."
         }
+
+
+@app.post(
+    "/voice/transcribe",
+    response_model=STTResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Voice STT"],
+    summary="Transcribe audio recording using Gnani Prisma V3.0",
+)
+@app.post(
+    "/stt/transcribe",
+    response_model=STTResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Voice STT"],
+    include_in_schema=False,
+)
+async def transcribe_audio(
+    audio_file: Optional[UploadFile] = File(
+        None, description="Audio file in WAV, MP3, OGG, FLAC, AAC, or M4A format"
+    ),
+    file: Optional[UploadFile] = File(
+        None, description="Alternative field name for audio file"
+    ),
+):
+    """Upload an audio file (max 30s, up to 10MB) to transcribe into text using Gnani Prisma V3.0."""
+    upload = audio_file or file
+    if not upload:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Audio file is required. Please upload using 'audio_file' or 'file' field.",
+        )
+
+    file_bytes = await upload.read()
+    validate_audio_file(
+        upload.filename or "",
+        upload.content_type or "",
+        file_bytes,
+    )
+
+    return await call_gnani_stt(
+        file_bytes=file_bytes,
+        filename=upload.filename or "recording.wav",
+        content_type=upload.content_type or "audio/wav",
+    )

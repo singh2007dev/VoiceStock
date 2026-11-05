@@ -30,3 +30,8 @@ class ProductResponse(ProductBase):
 
     class Config:
         from_attributes = True
+
+
+class STTResponse(BaseModel):
+    transcript: str = Field(..., description="Recognized speech transcript")
+    language: str = Field(default="unknown", description="Detected language code")
