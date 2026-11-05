@@ -4,6 +4,9 @@
 const API_BASE = '/api'
 const FALLBACK_BASE = 'http://127.0.0.1:8000'
 
+// Default to mock mode for credit protection. Set to false when ready for live backend STT.
+export const DEFAULT_MOCK_STT = true
+
 async function request(endpoint, options = {}) {
   let url = `${API_BASE}${endpoint}`
   const config = {
@@ -16,7 +19,6 @@ async function request(endpoint, options = {}) {
 
   try {
     let res = await fetch(url, config)
-    // If proxy failed with 404/502/network, retry direct
     if (!res.ok && res.status >= 500) {
       res = await fetch(`${FALLBACK_BASE}${endpoint}`, config)
     }
@@ -29,7 +31,6 @@ async function request(endpoint, options = {}) {
 
     return await res.json()
   } catch (err) {
-    // If initial fetch threw a network error, try fallback directly
     if (url.startsWith('/api')) {
       try {
         const fallbackRes = await fetch(`${FALLBACK_BASE}${endpoint}`, config)
@@ -63,4 +64,61 @@ export const api = {
     request(`/products/${id}`, {
       method: 'DELETE',
     }),
+
+  // Voice STT integration with local mock mode for credit protection
+  transcribeAudio: async (audioBlob, filename = 'recording.webm', useMock = false) => {
+    // Credit Protection: If mock mode is active, simulate realistic network latency
+    // and return sample response without calling Gnani API
+    if (useMock) {
+      await new Promise((resolve) => setTimeout(resolve, 700))
+      return {
+        transcript: 'Add 20 packets of Maggi',
+        language: 'en',
+      }
+    }
+
+    // Real backend STT call
+    const formData = new FormData()
+    formData.append('audio_file', audioBlob, filename)
+
+    let url = `${API_BASE}/voice/transcribe`
+    try {
+      let res = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok && res.status >= 500) {
+        res = await fetch(`${FALLBACK_BASE}/voice/transcribe`, {
+          method: 'POST',
+          body: formData,
+        })
+      }
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        const message = errorData.detail || errorData.message || `Voice transcription failed with status ${res.status}`
+        throw new Error(message)
+      }
+
+      return await res.json()
+    } catch (err) {
+      if (url.startsWith('/api')) {
+        try {
+          const fallbackRes = await fetch(`${FALLBACK_BASE}/voice/transcribe`, {
+            method: 'POST',
+            body: formData,
+          })
+          if (!fallbackRes.ok) {
+            const errorData = await fallbackRes.json().catch(() => ({}))
+            throw new Error(errorData.detail || `Voice transcription failed with status ${fallbackRes.status}`)
+          }
+          return await fallbackRes.json()
+        } catch (fallbackErr) {
+          throw new Error(fallbackErr.message || 'Unable to connect to VoiceStock backend for transcription.')
+        }
+      }
+      throw err
+    }
+  },
 }

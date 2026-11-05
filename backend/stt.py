@@ -20,6 +20,7 @@ ALLOWED_EXTENSIONS: Set[str] = {
     ".flac",
     ".aac",
     ".m4a",
+    ".webm",
 }
 
 ALLOWED_MIME_TYPES: Set[str] = {
@@ -38,6 +39,8 @@ ALLOWED_MIME_TYPES: Set[str] = {
     "audio/x-m4a",
     "audio/mp4",
     "video/mp4",  # Often sent by browsers recording audio/mp4 (m4a)
+    "audio/webm",
+    "video/webm",
 }
 
 

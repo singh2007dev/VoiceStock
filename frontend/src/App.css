@@ -880,3 +880,227 @@ body {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+/* Voice Recorder Component Styles */
+.voice-recorder-card {
+  border-left: 4px solid var(--primary);
+}
+
+.voice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.voice-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.voice-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+.status-ready {
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.status-recording {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+  animation: pulse-border 1.5s infinite;
+}
+
+.status-processing {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.status-error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.mock-toggle-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.mock-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mock-label input {
+  display: none;
+}
+
+.mock-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mock-active {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.mock-live {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.voice-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-voice {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-voice-ready {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btn-voice-ready:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-voice-recording {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.btn-voice-recording:hover {
+  background: #b91c1c;
+}
+
+.btn-voice-processing {
+  background: #64748b;
+  color: #ffffff;
+}
+
+.recording-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.record-pulse {
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  animation: pulse-dot 1s infinite alternate;
+}
+
+@keyframes pulse-dot {
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.spinner-large {
+  width: 18px;
+  height: 18px;
+}
+
+.voice-error-banner {
+  margin: 0;
+}
+
+/* Transcript Display Box */
+.transcript-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.transcript-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.transcript-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.transcript-lang {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: #ffffff;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.transcript-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.transcript-mock-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}

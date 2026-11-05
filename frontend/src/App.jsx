@@ -3,6 +3,7 @@ import { api } from './services/api'
 import { Header } from './components/Header'
 import { SummaryCards } from './components/SummaryCards'
 import { LowStockAlert } from './components/LowStockAlert'
+import { VoiceRecorder } from './components/VoiceRecorder'
 import { ProductForm } from './components/ProductForm'
 import { ProductTable } from './components/ProductTable'
 import { EditQuantityModal } from './components/EditQuantityModal'
@@ -145,6 +146,9 @@ export default function App() {
           lowStockProducts={lowStockProducts}
           onOpenQuantityModal={(prod) => setActiveProductForEdit(prod)}
         />
+
+        {/* Voice Assistant Recorder */}
+        <VoiceRecorder />
 
         {/* Add Product Form */}
         <ProductForm
