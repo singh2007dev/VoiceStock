@@ -3,6 +3,7 @@ import sqlite3
 from typing import List
 
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import get_db_connection, init_db, row_to_dict
 from backend.schemas import (
@@ -23,6 +24,21 @@ app = FastAPI(
     title="VoiceStock API",
     description="Voice-powered inventory management for small kirana stores",
     lifespan=lifespan,
+)
+
+# Enable CORS for the frontend development server
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "*",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
