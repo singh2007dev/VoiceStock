@@ -12,6 +12,10 @@ ENV/
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+
+# Scratch & temporary testing files
+scratch/
 
 # Operating System files
 .DS_Store

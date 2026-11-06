@@ -65,15 +65,67 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // Execute parsed voice command on inventory database
+  executeVoiceCommand: (transcript) =>
+    request('/voice/command', {
+      method: 'POST',
+      body: JSON.stringify({ transcript }),
+    }),
+
+  // Gnani Timbre TTS: converts response text to playable WAV audio blob
+  textToSpeech: async (text, mockTts = false) => {
+    let url = `${API_BASE}/voice/speak`
+    const payload = JSON.stringify({ text, mock_tts: mockTts })
+    const config = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    }
+
+    try {
+      let res = await fetch(url, config)
+      if (!res.ok && res.status >= 500) {
+        res = await fetch(`${FALLBACK_BASE}/voice/speak`, config)
+      }
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.detail || `TTS request failed with status ${res.status}`)
+      }
+      return await res.blob()
+    } catch (err) {
+      if (url.startsWith('/api')) {
+        try {
+          const fallbackRes = await fetch(`${FALLBACK_BASE}/voice/speak`, config)
+          if (!fallbackRes.ok) {
+            const errorData = await fallbackRes.json().catch(() => ({}))
+            throw new Error(errorData.detail || `TTS request failed with status ${fallbackRes.status}`)
+          }
+          return await fallbackRes.blob()
+        } catch (fallbackErr) {
+          throw new Error(fallbackErr.message || 'Unable to connect to TTS backend service.')
+        }
+      }
+      throw err
+    }
+  },
+
   // Voice STT integration with local mock mode for credit protection
-  transcribeAudio: async (audioBlob, filename = 'recording.webm', useMock = false) => {
+  transcribeAudio: async (audioBlob, filename = 'recording.webm', useMock = false, mockIndex = 0) => {
     // Credit Protection: If mock mode is active, simulate realistic network latency
-    // and return sample response without calling Gnani API
+    // and return clearly labeled sample response without calling Gnani API
     if (useMock) {
-      await new Promise((resolve) => setTimeout(resolve, 700))
+      await new Promise((resolve) => setTimeout(resolve, 600))
+      const sampleCommands = [
+        'Add 20 packets of Maggi',
+        'I sold 5 packets of Maggi',
+        'How much Maggi is left?',
+        'Show low-stock products',
+      ]
+      const idx = Math.abs(Number(mockIndex) || 0) % sampleCommands.length
       return {
-        transcript: 'Add 20 packets of Maggi',
+        transcript: sampleCommands[idx],
         language: 'en',
+        isSimulated: true,
       }
     }
 

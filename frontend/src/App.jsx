@@ -148,7 +148,15 @@ export default function App() {
         />
 
         {/* Voice Assistant Recorder */}
-        <VoiceRecorder />
+        <VoiceRecorder
+          onInventoryUpdated={loadInventory}
+          onCommandExecuted={(res) => {
+            if (res && res.message && res.success) {
+              notifySuccess(res.message)
+            }
+            loadInventory()
+          }}
+        />
 
         {/* Add Product Form */}
         <ProductForm
